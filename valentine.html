@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:#0b0f1a;color:#e9eefc;display:grid;place-items:center}
+    .card{max-width:520px;width:92vw;background:rgba(18,26,44,0.9);padding:18px;border-radius:14px;text-align:center}
+    img{width:100%;height:auto;border-radius:10px;display:block}
+    .buttons{display:flex;gap:12px;justify-content:center;margin-top:12px}
+    button{padding:10px 16px;border-radius:10px;border:0;background:#ff4d7d;color:#fff;font-weight:700;cursor:pointer}
+    .yes{background:#42d27a}
+    .no{background:#ff6b6b}
+    .result{margin-top:10px;color:#fff}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 id="question">Will you be my Valentine?</h2>
+    <img id="catImg" src="cat.jpg" alt="cat" onerror="this.style.opacity=0.6;this.insertAdjacentHTML('afterend','<p style=\"color:#aab6df;\">(cat.jpg nicht gefunden)</p>')">
+
+    <div class="buttons">
+      <button id="yesBtn" class="yes">Yes</button>
+      <button id="noBtn" class="no">No</button>
+    </div>
+
+    <p id="result" class="result"></p>
+  </div>
+
+  <script>
+    // read optional query params
+    const params = new URLSearchParams(location.search);
+    const msg = params.get('message') || 'Will you be my Valentine?';
+    document.getElementById('question').textContent = msg;
+
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const result = document.getElementById('result');
+
+    yesBtn.addEventListener('click', () => {
+      result.textContent = 'Danke! 💖';
+      yesBtn.disabled = true; noBtn.disabled = true;
+    });
+
+    // Nach 5x No klicken soll der No-Button verschwinden
+    let noCount = 0;
+    noBtn.addEventListener('click', () => {
+      noCount += 1;
+      if (noCount >= 5) {
+        noBtn.style.transition = 'opacity 240ms ease';
+        noBtn.style.opacity = '0';
+        setTimeout(() => { noBtn.style.display = 'none'; }, 260);
+        result.textContent = 'No-Button ausgeblendet.';
+        return;
+      }
+      result.textContent = `Schade... vielleicht später. (${noCount}/5)`;
+    });
+  </script>
+</body>
+</html>

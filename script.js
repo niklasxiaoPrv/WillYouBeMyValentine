@@ -170,7 +170,14 @@ function gameOver() {
 
 function showValentineUI() {
   setHud();
-  valentineEl.classList.remove("hidden");
+  // Öffne eine neue Seite mit dem Bild und den Buttons.
+  const params = new URLSearchParams({ message: MESSAGE, text: collectedText });
+  const url = 'valentine.html?' + params.toString();
+  const w = window.open(url, '_blank');
+  if (!w) {
+    // Popup blockiert? Dann im selben Tab navigieren.
+    window.location.href = url;
+  }
 }
 
 // ========= Render =========
