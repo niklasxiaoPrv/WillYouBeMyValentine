@@ -129,7 +129,7 @@ function step() {
     onEat();
     food = spawnFood();
     // deutlich schneller beim Einsammeln
-    tickMs = Math.max(45, tickMs - 8);
+    tickMs = Math.max(2, tickMs - 0);
     stopLoop();
     startLoop();
   } else {
