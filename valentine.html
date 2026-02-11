@@ -39,8 +39,13 @@
     const result = document.getElementById('result');
 
     yesBtn.addEventListener('click', () => {
-      result.textContent = 'Danke! 💖';
-      yesBtn.disabled = true; noBtn.disabled = true;
+      // Zeige die abschließende Ansicht mit Image.jpg und Text
+      const card = document.querySelector('.card');
+      card.innerHTML = `
+        <h2>Okay see you rojo blancho</h2>
+        <img src="Image.jpg" alt="image" style="width:100%;height:auto;border-radius:10px;display:block;margin-top:10px">
+        <p style="color:#aab6df;margin-top:12px">Danke fürs Spielen!</p>
+      `;
     });
 
     // Nach 5x No klicken soll der No-Button verschwinden
