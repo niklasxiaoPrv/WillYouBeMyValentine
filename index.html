@@ -17,6 +17,16 @@
 
     <canvas id="game" width="420" height="420" aria-label="Snake game"></canvas>
 
+      <!-- Touch controls for mobile -->
+      <div id="touchControls" class="touch-controls" aria-hidden="false">
+        <button class="tbtn" data-dir="up" aria-label="Up">▲</button>
+        <div class="trow">
+          <button class="tbtn" data-dir="left" aria-label="Left">◀</button>
+          <button class="tbtn" data-dir="down" aria-label="Down">▼</button>
+          <button class="tbtn" data-dir="right" aria-label="Right">▶</button>
+        </div>
+      </div>
+
     <section id="valentine" class="valentine hidden" aria-live="polite">
       <h2 id="question">Will you be my Valentine?</h2>
 

@@ -18,7 +18,7 @@ const resultEl = document.getElementById("result");
 
 // ========= Snake state =========
 const GRID = 21;                    // 21x21 Felder
-const CELL = canvas.width / GRID;   // quadratische Zellen
+let CELL = 0;   // wird bei resize gesetzt
 
 let snake, dir, nextDir, food, running, tickMs, timer;
 let applesEaten, letterIndex, collectedText, phase; // phase: "apples" | "letters" | "done"
@@ -43,9 +43,33 @@ function resetGame() {
   questionEl.textContent = "Will you be my Valentine?";
 
   setHud();
+  resizeCanvas();
   stopLoop();
   startLoop();
   draw();
+}
+
+function resizeCanvas() {
+  // berechne verfügbares Quadrat: nutze das kleinere der Dimensionen
+  const hudHeight = document.querySelector('.hud')?.getBoundingClientRect().height || 60;
+  const controlsHeight = document.querySelector('.controls')?.getBoundingClientRect().height || 60;
+  const valentineHeight = document.getElementById('valentine')?.getBoundingClientRect().height || 0;
+  const touchHeight = document.getElementById('touchControls')?.getBoundingClientRect().height || 0;
+
+  const verticalPadding = 24; // etwas Puffer
+  const availableW = window.innerWidth - 24;
+  const availableH = window.innerHeight - hudHeight - controlsHeight - valentineHeight - touchHeight - verticalPadding;
+  const size = Math.floor(Math.min(availableW, availableH));
+
+  // setze CSS Größe (sichtbar) und Pixel-Auflösung für scharfe Darstellung
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(size * dpr));
+  canvas.height = Math.max(1, Math.floor(size * dpr));
+
+  CELL = canvas.width / GRID;
 }
 
 function setHud() {
@@ -91,17 +115,11 @@ function step() {
   const head = snake[0];
   const newHead = { x: head.x + dir.x, y: head.y + dir.y };
 
-  // walls
-  if (newHead.x < 0 || newHead.y < 0 || newHead.x >= GRID || newHead.y >= GRID) {
-    gameOver();
-    return;
-  }
+  // wrap-around walls (kein Game Over)
+  newHead.x = (newHead.x + GRID) % GRID;
+  newHead.y = (newHead.y + GRID) % GRID;
 
-  // self collision
-  if (snake.some((s, i) => i !== 0 && s.x === newHead.x && s.y === newHead.y)) {
-    gameOver();
-    return;
-  }
+  // Selbstkollisionen werden jetzt ignoriert (kein Game Over)
 
   snake.unshift(newHead);
 
@@ -146,9 +164,8 @@ function onEat() {
 }
 
 function gameOver() {
-  running = false;
-  stopLoop();
-  statusEl.textContent = "Game Over 😅 — klick auf Neu starten";
+  // Für Kompatibilität beibehalten, aber das Spiel nicht stoppen.
+  statusEl.textContent = "Kollision ignoriert — weiter geht's!";
 }
 
 function showValentineUI() {
@@ -194,25 +211,56 @@ function drawFood() {
 
   if (phase === "apples") {
     // apple emoji
-    ctx.font = `${Math.floor(CELL * 0.9)}px system-ui`;
+    const fontSize = Math.max(12, Math.floor(CELL * 0.75));
+    ctx.font = `${fontSize}px system-ui`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("🍎", centerX, centerY + 1);
+      // make sure apple glyph fits inside the cell (use small padding)
+      const aPad = Math.max(2, Math.floor(CELL * 0.12));
+      const aRect = CELL - aPad * 2;
+      let aFont = Math.floor(aRect * 0.85);
+      aFont = Math.max(10, aFont);
+      const apple = "🍎";
+      while (aFont > 8) {
+        ctx.font = `${aFont}px system-ui`;
+        if (ctx.measureText(apple).width <= aRect * 0.95) break;
+        aFont -= 1;
+      }
+      ctx.font = `${aFont}px system-ui`;
+      ctx.fillText(apple, centerX, centerY + 1);
   } else if (phase === "letters") {
     const ch = pendingChar ?? "?";
+    // proportional padding so glyphs fit inside the cell
+    const pad = Math.max(3, Math.floor(CELL * 0.12));
+    const radius = Math.max(4, Math.floor(CELL * 0.12));
+    const rectSize = CELL - pad * 2;
+    const rx = food.x * CELL + pad;
+    const ry = food.y * CELL + pad;
+
     ctx.fillStyle = "#ff4d7d";
     ctx.beginPath();
-    ctx.roundRect(food.x * CELL + 3, food.y * CELL + 3, CELL - 6, CELL - 6, 8);
+    ctx.roundRect(rx, ry, rectSize, rectSize, radius);
     ctx.fill();
 
-    ctx.fillStyle = "#0b0f1a";
-    ctx.font = `800 ${Math.floor(CELL * 0.65)}px system-ui`;
+    // choose a font size that fits the rect
+    let fontSize = Math.floor(rectSize * 0.68);
+    fontSize = Math.max(10, fontSize);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(ch === " " ? "␠" : ch, centerX, centerY + 1);
+    ctx.fillStyle = "#0b0f1a";
+    const drawChar = ch === " " ? "␠" : ch;
+    while (fontSize > 8) {
+      ctx.font = `800 ${fontSize}px system-ui`;
+      const w = ctx.measureText(drawChar).width;
+      if (w <= rectSize * 0.86) break;
+      fontSize -= 1;
+    }
+    ctx.font = `800 ${fontSize}px system-ui`;
+    ctx.fillText(drawChar, centerX, centerY + 1);
   } else {
     // done: show heart
-    ctx.font = `${Math.floor(CELL * 0.9)}px system-ui`;
+    const fontSize = Math.max(12, Math.floor(CELL * 0.75));
+    ctx.font = `${fontSize}px system-ui`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("💖", centerX, centerY + 1);
@@ -254,6 +302,36 @@ window.addEventListener("keydown", (e) => {
     nextDir = map[key];
   }
 });
+
+// Resize handling
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  draw();
+});
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => { resizeCanvas(); draw(); }, 120);
+});
+
+// Touch controls: map buttons to directions
+const touchContainer = document.getElementById('touchControls');
+if (touchContainer) {
+  touchContainer.addEventListener('pointerdown', (e) => {
+    const btn = e.target.closest('[data-dir]');
+    if (!btn) return;
+    const dirKey = btn.getAttribute('data-dir');
+    const map = {
+      up: { x: 0, y: -1 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
+      right: { x: 1, y: 0 },
+    };
+    if (map[dirKey]) {
+      nextDir = map[dirKey];
+    }
+    // prevent focus/scroll
+    e.preventDefault();
+  }, { passive: false });
+}
 
 // ========= Valentine Buttons =========
 let yesScale = 1;
