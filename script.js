@@ -31,7 +31,7 @@ function resetGame() {
   food = spawnFood();
   running = true;
   // schnellere Grundgeschwindigkeit
-  tickMs = 120;
+  tickMs = 160;
 
   applesEaten = 0;
   letterIndex = 0;
