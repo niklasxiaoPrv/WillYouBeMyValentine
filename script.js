@@ -30,7 +30,8 @@ function resetGame() {
   nextDir = { x: 1, y: 0 };
   food = spawnFood();
   running = true;
-  tickMs = 190;
+  // schnellere Grundgeschwindigkeit
+  tickMs = 120;
 
   applesEaten = 0;
   letterIndex = 0;
@@ -127,8 +128,8 @@ function step() {
   if (newHead.x === food.x && newHead.y === food.y) {
     onEat();
     food = spawnFood();
-    // leicht schneller
-    tickMs = Math.max(70, tickMs - 2);
+    // deutlich schneller beim Einsammeln
+    tickMs = Math.max(45, tickMs - 8);
     stopLoop();
     startLoop();
   } else {
