@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine Snake</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1>Snake</h1>
+
+    <section class="hud">
+      <div id="status">Sammle zuerst Äpfel 🍎 …</div>
+      <div id="progress"></div>
+    </section>
+
+    <canvas id="game" width="420" height="420" aria-label="Snake game"></canvas>
+
+    <section id="valentine" class="valentine hidden" aria-live="polite">
+      <h2 id="question">Will you be my Valentine?</h2>
+
+      <div class="buttons">
+        <button id="yesBtn" class="yes">Yes</button>
+        <button id="noBtn" class="no">No</button>
+      </div>
+
+      <p id="result" class="result"></p>
+    </section>
+
+    <div class="controls">
+      <button id="restartBtn" class="secondary">Neu starten</button>
+      <p class="hint">Steuerung: Pfeiltasten oder WASD</p>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
