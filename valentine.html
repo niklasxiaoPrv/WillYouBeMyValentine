@@ -34,6 +34,16 @@
     const msg = params.get('message') || 'Will you be my Valentine?';
     document.getElementById('question').textContent = msg;
 
+    // Entferne eventuelle alte Fehlermeldung, die zuvor per onerror eingefügt wurde
+    (function cleanupOldError() {
+      const img = document.getElementById('catImg');
+      if (!img) return;
+      const nextEl = img.nextElementSibling;
+      if (nextEl && nextEl.tagName === 'P' && /cat\.jpg nicht gefunden/.test(nextEl.textContent)) nextEl.remove();
+      const nextNode = img.nextSibling;
+      if (nextNode && nextNode.nodeType === Node.TEXT_NODE && /cat\.jpg nicht gefunden/.test(nextNode.textContent)) nextNode.remove();
+    })();
+
     const yesBtn = document.getElementById('yesBtn');
     const noBtn = document.getElementById('noBtn');
     const result = document.getElementById('result');
