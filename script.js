@@ -125,16 +125,13 @@ function step() {
   snake.unshift(newHead);
 
   // eat?
-  if (newHead.x === food.x && newHead.y === food.y) {
-    onEat();
-    food = spawnFood();
-    // deutlich schneller beim Einsammeln
-    tickMs = Math.max(2, tickMs - 0);
-    stopLoop();
-    startLoop();
-  } else {
-    snake.pop();
-  }
+    if (newHead.x === food.x && newHead.y === food.y) {
+      onEat();
+      food = spawnFood();
+      // Geschwindigkeit bleibt konstant: keine Anpassung von `tickMs` und kein Neustart des Loops
+    } else {
+      snake.pop();
+    }
 
   draw();
 }
