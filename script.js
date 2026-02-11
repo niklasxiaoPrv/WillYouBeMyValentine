@@ -30,7 +30,7 @@ function resetGame() {
   nextDir = { x: 1, y: 0 };
   food = spawnFood();
   running = true;
-  tickMs = 120;
+  tickMs = 190;
 
   applesEaten = 0;
   letterIndex = 0;
